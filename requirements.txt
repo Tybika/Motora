@@ -1,0 +1,13 @@
+numpy
+scipy
+joblib
+threadpoolctl
+cython
+cpython
+meson-python
+customtkinter
+pymongo
+scikit-learn
+matplotlib
+pandas
+statistics
