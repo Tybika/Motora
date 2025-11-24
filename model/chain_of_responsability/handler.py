@@ -1,3 +1,5 @@
+import paths
+
 from abc import ABC, abstractmethod
 from response import Response
 

@@ -10,9 +10,9 @@ class Request:
     
     def default_op(self):
         operations = {
-            1: ["c", "n", "create", "new"],
-            2: ["r", "g", "q", "read", "retrieve", "get", "query"],
-            3: ["u", "update"],
+            1: "create",
+            2: "query",
+            3: "update",
             4: ["d", "e", "delete", "erase"]
         }
         return operations

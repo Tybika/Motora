@@ -3,7 +3,10 @@ from response import Response
 
 class Motora:
     def __init__(self):
-        query = ''
+        self.controller = None
+
+    def set_controller(self, controller: object):
+        self.controller = controller
 
     def request(self, type: str, **kwargs):
         request = Request()
@@ -26,8 +29,9 @@ class Motora:
 
         return request         
 
-    def process(self, request_type: str, data, **kwargs):
-        request = self.request(request_type, **kwargs)
-        self.query.handle()
+    def process(self):#, request_type: str, data, **kwargs):
+        print("Processing")
+        # request = self.request(request_type, **kwargs)
+        # self.query.handle()
 
     

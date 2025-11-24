@@ -9,6 +9,9 @@ class Controller:
     def set_view(self, view: object):
         self.view = view
 
+    def test_connection(self):
+        self.model.process()
+
     def get_general_data(self):
         return self.model.process("retrieve")
     

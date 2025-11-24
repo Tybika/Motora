@@ -3,7 +3,6 @@ scipy
 joblib
 threadpoolctl
 cython
-cpython
 meson-python
 customtkinter
 pymongo
