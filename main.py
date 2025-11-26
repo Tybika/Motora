@@ -22,6 +22,7 @@ def main():
     controller.set_model(model)
     controller.set_view(view)
 
+    # Inicalização da GUI
     view._run()
 
 if __name__ == '__main__':

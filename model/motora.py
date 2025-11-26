@@ -1,10 +1,29 @@
+import paths
+
 from request import Request
 from response import Response
+from database import Database
+from sanitizer import Sanitizer
+from map_data import MapData
+from classifier import Classifier
 
 class Motora:
     def __init__(self):
         self.controller = None
 
+        # Instancia handlers
+        self.query = Database()
+        self.sanit = Sanitizer()
+        self._map = MapData()
+        self.classify = Classifier()
+        self.persist = Database()
+
+        # Encadeia handlers
+        self.query.set_next(self.sanit)
+        self.sanit.set_next(self._map)
+        self._map.set_next(self.classify)
+        self.classify.set_next(self.persist)
+        
     def set_controller(self, controller: object):
         self.controller = controller
 

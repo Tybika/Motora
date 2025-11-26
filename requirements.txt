@@ -6,7 +6,7 @@ cython
 meson-python
 customtkinter
 pymongo
-scikit-learn
+sklearn
 matplotlib
 pandas
 statistics
