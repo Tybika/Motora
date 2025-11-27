@@ -8,7 +8,8 @@ paths = [
     os.path.abspath(os.path.join(ROOT, "controller")),
     os.path.abspath(os.path.join(ROOT, "view")),
     os.path.abspath(os.path.join(ROOT, "model")),
-    os.path.abspath(os.path.join(ROOT, "model", 'chain_of_responsability'))
+    os.path.abspath(os.path.join(ROOT, "model", "assets")),
+    os.path.abspath(os.path.join(ROOT, "model", "chain_of_responsability"))
     ]
 
 for path in paths: 

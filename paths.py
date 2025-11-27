@@ -1,10 +1,16 @@
 import sys
 import os
 
-ROOT = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.abspath(os.path.dirname(os.path.dirname(
+    os.path.dirname(__file__))))
 
-sys.path.append(os.path.abspath(os.path.join(ROOT, 'controller')))
-sys.path.append(os.path.abspath(os.path.join(ROOT, 'view')))
-sys.path.append(os.path.abspath(os.path.join(ROOT, 'model')))
-sys.path.append(os.path.abspath(os.path.join(ROOT, 'model', 
-                                 'chain_of_responsability')))
+paths = [
+    os.path.abspath(os.path.join(ROOT, "controller")),
+    os.path.abspath(os.path.join(ROOT, "view")),
+    os.path.abspath(os.path.join(ROOT, "model")),
+    os.path.abspath(os.path.join(ROOT, "model", "assets")),
+    os.path.abspath(os.path.join(ROOT, "model", "chain_of_responsability"))
+    ]
+
+for path in paths: 
+    sys.path.append(path)
