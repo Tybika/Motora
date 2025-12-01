@@ -13,14 +13,9 @@ class Handler(ABC):
     def new_response(self, type: str, request: object):
         response = Response()
         response.set_type(type)
-        response.set_data(request.data)
+        response.set_data(request.data["data"])
         return response
 
     @abstractmethod
     def handle(self, request: object):
-        # Handle chain or final, should be overwritten  
-        if not self.next == None:
-            pass
-        else:
-            return self.new_response()
-            
+        pass

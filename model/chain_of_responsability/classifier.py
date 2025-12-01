@@ -1,48 +1,41 @@
-import pandas
 import joblib
 from pathlib import Path
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score
-
-import paths
 from handler import Handler
-from database import Database
 
 class Classifier(Handler):
     def __init__(self):
         super().__init__()
-        print("vai vir aí treino do knn vamo ver")
-        self.handle()
+        base = (Path(__file__).resolve().parents[1] / "assets")
+        self.cardio = joblib.load(base / "knn_model_cardio.pkl")
+        self.cscaler = joblib.load(base / "scaller_cardio.pkl")
+        self.flex = joblib.load(base / "knn_model_flex.pkl")
+        self.fscaler = joblib.load(base / "scaller_flex.pkl")
 
-    def handle(self):
-        scaler = StandardScaler()
-        db = Database()
-        dataframe = pandas.DataFrame(db.get_training("training-cardio"))
-
-        # X = as características, normalizadas e tal
-        X = dataframe.drop(columns=["category"])
-        X = pandas.get_dummies(X)
-
-        # y = o rótulo 
-        y = dataframe["category"]
-
-        # define cada uma dessas variáveis com método próprio
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.25, random_state=42)
+    def predict(self, id: str, vector: list):
+        if id == "cardio":
+            vector = self.cscaler.transform(vector)
+            return self.cardio.predict(vector)
+        elif id == "flex":
+            vector = self.fscaler.transform(vector)
+            return self.flex.predict(vector)
+        return None
         
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
+    def handle(self, request):
+        try:
+            vector = request.data["data"]["vector"]
+            v_flex = [vector[:5]]
+            v_cardio = [vector[:4] + vector[5:]]
+            request.data["data"]["class-flex"] = int(self.predict(
+                                                "flex", v_flex))
+            request.data["data"]["class-cardio"] = int(self.predict(
+                                            "cardio", v_cardio))
+
+            request.add_state("classfied")
+
+            if self.next and not request.is_complete():
+                self.next.handle(request)
+            else:
+                return self.sponse("success", request)
         
-        knn = KNeighborsClassifier(n_neighbors=5)
-        knn.fit(X_train, y_train)
-
-        y_pred = knn.predict(X_test)
-        print("Acurácia:", accuracy_score(y_test, y_pred))
-
-        joblib.dump(knn,(Path(__file__).resolve().parents[1] / "assets" / "knn_model_cardio.pkl"))
-        joblib.dump(scaler, (Path(__file__).resolve().parents[1] / "assets" / "scaller_cardio.pkl"))
-
-
-
+        except:
+            return self.new_response("error", request)

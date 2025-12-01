@@ -10,19 +10,25 @@ class Controller:
         self.view = view
 
     def test_connection(self):
-        self.model.process()
+        print("NEW:", self.model.process("n", data=["Mimi", "59", "Feminino", "49,7", "1,5", "-16,8", "452"]))
+        print("READ:",self.model.process('r'))
+        print("UPDATE:",self.model.process('u', data_id={'name': "Mimi"}, data=["Mimizinha", "", "", "", "", "", ""]))
+        print("READ2:",self.model.process('r'))
 
     def get_general_data(self):
         return self.model.process("retrieve")
     
-    def get_type_combo(self):
-        return self.model.process("retrieve")
+    def get_search_options(self):
+        return self.model.get_options("search")
     
-    def get_athlete_data(self):
-        return self.model.process("retrieve")
+    def get_sex_options(self):
+        return self.model.get_options("sex")
+    
+    def get_athlete_data(self, data: list = None):
+        return self.model.process("query", data)
     
     def save_data(self):
-        self.model.process("new")
+        self.model.process("create")
 
     def alter_data(self, data: dict):
         self.model.process("update", {"id": data.id, "data": data.data })

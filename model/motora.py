@@ -10,7 +10,21 @@ from classifier import Classifier
 class Motora:
     def __init__(self):
         self.controller = None
+        self.new_responsability_chain()
 
+    def set_controller(self, controller: object):
+        self.controller = controller
+
+    def get_options(self, group:str):
+        options = {
+            "sex" : ["Feminino", "Masculino"],
+            "search" : ["Nome", "Sexo"]
+            }
+
+        if group in options:
+            return options[group]
+
+    def new_responsability_chain(self):
         # Instancia handlers
         self.query = Database()
         self.sanit = Sanitizer()
@@ -23,34 +37,47 @@ class Motora:
         self.sanit.set_next(self._map)
         self._map.set_next(self.classify)
         self.classify.set_next(self.persist)
-        
-    def set_controller(self, controller: object):
-        self.controller = controller
 
-    def request(self, type: str, **kwargs):
+    def request(self, type: str, id: dict, data: list):
         request = Request()
 
         match type:
-            case "create", "new", "n", "c":
-                request.set_operation("c")
-            case "read", "retrieve", "get", "query", "r", "g", "q":
-                request.set_operation("r")
-            case "update", "u":
-                request.set_operation("u")
-            case "delete", "erase", "d", "e":
-                request.set_operation("d")
-            case _:
-                request = None
+            case "create" | "new" | "n" | "c":
+                request.set_operation(1)
+                if not data:
+                    raise Exception("Dados ausentes para inserção")
+                request.set_data_data(data)
 
-        #pense isso melhor, acho que args combina menlhor ou uma única variavel
-        if kwargs:
-            request.set_data_id(**kwargs)
+            case "read" | "retrieve" | "get" | "query" | "r" | "g" | "q":
+                request.set_operation(2)
+                request.set_data_id(id)
 
+            case "update" | "u":
+                request.set_operation(3)
+                if not id or not data:
+                    raise Exception("Dados ausentes para atualização")
+                request.set_data_data(data)
+
+            case "delete" | "erase" | "d" | "e":
+                request.set_operation(4)
+                if not id:
+                    raise Exception("Identificador ausente para exclusão")
+
+        if request:
+            request.set_data_id(id)
         return request         
 
-    def process(self):#, request_type: str, data, **kwargs):
-        print("Processing")
-        # request = self.request(request_type, **kwargs)
-        # self.query.handle()
+    def process(self, request_type: str, data_id: dict = None, data: list = None):
+        request = self.request(request_type, data_id, data)
 
+        if request:
+            response = self.query.handle(request)
+        else:
+            response = Response()
+            response.set_type("error")
+        
+        if response and response.type:
+            return response.data
+        else:
+            raise Exception()
     

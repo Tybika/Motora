@@ -1,11 +1,10 @@
 class Request:
     def __init__(self):
-        self.operation = ""
+        self.operation = 0
         self.data = {
             "id": {},
             "data": {}
             }
-        self.author
         self.states = []
     
     def default_op(self):
@@ -24,11 +23,28 @@ class Request:
                 return True
         return False
 
-    def set_data_id(self, data: any):
+    def set_data_id(self, data: dict):
         self.data["id"] = data
-        
-    def get_data(self):
-        return self.data['data']
+    
+    def set_data_data(self, data: any):
+        self.data["data"] = data
 
-    def addstate(statename):
-        pass
+    def add_state(self, statename: str):
+        self.states.append(statename)
+
+    def is_complete(self):
+        states = { 
+            1: set(["sanitized", "mapped", "classfied", "stored"]),
+            2: set(["presented", "listed"]),
+            3: set(["sanitized", "mapped", "classfied", "stored"]),
+            4: set([])
+            }
+        
+        obj_states = set(self.states)
+
+        for key in states:
+            if key == self.operation:
+                s_set = set(states[key])
+                if obj_states == s_set:
+                    return True
+        return False
