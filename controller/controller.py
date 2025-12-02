@@ -24,11 +24,11 @@ class Controller:
     def get_sex_options(self):
         return self.model.get_options("sex")
     
-    def get_athlete_data(self, data: list = None):
-        return self.model.process("query", data)
+    def get_athlete_data(self, identifier: dict = None):
+        return self.model.process("query", data_id=identifier)
     
-    def save_data(self):
-        self.model.process("create")
+    def save_data(self, data):
+        self.model.process("create", data=data)
 
     def alter_data(self, data: dict):
         self.model.process("update", {"id": data.id, "data": data.data })

@@ -99,8 +99,8 @@ class MapData(Handler):
             if self.next and not request.is_complete():
                 self.next.handle(request)
             else:
-                print("óia os data", request.data)
-                return self.new_response(True, request)
+                return self.new_response("success", request)
         
-        except:
+        except Exception as e:
+            print(e)
             return self.new_response("error", request)

@@ -117,5 +117,6 @@ class Sanitizer(Handler):
             else:
                 return self.new_response("success", request)
             
-        except:
+        except Exception as e:
+            print(e)
             return self.new_response("error", request)

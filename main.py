@@ -3,17 +3,20 @@ import subprocess
 import sys
 import os
 
-from motora import Motora
-from controller import Controller
-from view import MainView
-
-def main():
+def deps():
     # Instalação de dependências
     if not os.path.exists('deps.txt'):
         subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", 
                                 "requirements.txt"])
         with open("deps.txt", "x") as file:
             pass
+
+def main():
+    deps()
+    
+    from motora import Motora
+    from controller import Controller
+    from view import MainView
 
     # Instâncias MVC
     model = Motora()

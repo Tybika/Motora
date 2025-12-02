@@ -45,7 +45,7 @@ class Motora:
             case "create" | "new" | "n" | "c":
                 request.set_operation(1)
                 if not data:
-                    raise Exception("Dados ausentes para inserção")
+                    request = None
                 request.set_data_data(data)
 
             case "read" | "retrieve" | "get" | "query" | "r" | "g" | "q":
@@ -55,13 +55,13 @@ class Motora:
             case "update" | "u":
                 request.set_operation(3)
                 if not id or not data:
-                    raise Exception("Dados ausentes para atualização")
+                    request = None
                 request.set_data_data(data)
 
             case "delete" | "erase" | "d" | "e":
                 request.set_operation(4)
                 if not id:
-                    raise Exception("Identificador ausente para exclusão")
+                    request = None
 
         if request:
             request.set_data_id(id)
@@ -70,14 +70,16 @@ class Motora:
     def process(self, request_type: str, data_id: dict = None, data: list = None):
         request = self.request(request_type, data_id, data)
 
+        # Se o request , dispara corrente
         if request:
             response = self.query.handle(request)
+            print(response)
         else:
             response = Response()
             response.set_type("error")
         
-        if response and response.type:
+        if response.type:
             return response.data
         else:
-            raise Exception()
+            raise Exception("só no final")
     
