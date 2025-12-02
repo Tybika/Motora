@@ -33,7 +33,7 @@ class Classifier(Handler):
             request.add_state("classfied")
 
             if self.next and not request.is_complete():
-                self.next.handle(request)
+                return self.next.handle(request)
             else:
                 return self.new_response("success", request)
         

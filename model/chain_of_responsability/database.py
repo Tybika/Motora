@@ -12,7 +12,7 @@ class Database(Handler):
         self.athletes = self.database["athletes"]
 
     def get_athletes(self, request_data):
-        if not request_data["id"]:
+        if request_data["id"] == None:
             return list(self.athletes.find({}, {'_id': 0}))  
         else:
             return self.athletes.find_one(request_data["id"])
@@ -26,7 +26,6 @@ class Database(Handler):
 
         meta["last"] = latest["_id"].generation_time
         return meta
-
 
     def update_document(self, request_data):
         filter = request_data["id"]
@@ -48,8 +47,9 @@ class Database(Handler):
                 request.add_state("stored")
 
             elif op == 2:
-                if "meta" in request.id:
-                    request.set_data_data(self.get_meta())
+                if not request.data["id"] == None:
+                    if "meta" in request.data["id"]:
+                        request.set_data_data(self.get_meta())
                 else:
                     request.set_data_data(self.get_athletes(request.data))
 
@@ -61,7 +61,7 @@ class Database(Handler):
                 self.del_document(request.data)
 
             if self.next and not request.is_complete():
-                self.next.handle(request)
+                return self.next.handle(request)
             else:
                 return self.new_response("success", request)
             

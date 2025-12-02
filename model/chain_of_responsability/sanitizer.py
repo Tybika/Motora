@@ -92,7 +92,6 @@ class Sanitizer(Handler):
                     data[5] = self.sanit_num(data[5], True)
                     data[6] = self.sanit_num(data[6], True)
 
-                print("sanitized:", data)
                 request.add_state("sanitized")
 
             elif request.operation == 2:
@@ -113,7 +112,7 @@ class Sanitizer(Handler):
                 request.add_state("presented")
 
             if self.next and not request.is_complete():
-                self.next.handle(request)
+                return self.next.handle(request)
             else:
                 return self.new_response("success", request)
             

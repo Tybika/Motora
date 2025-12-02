@@ -200,13 +200,18 @@ class MainView:
         cardio.grid(row=row, column=3, sticky="w")
 
     def update_search_list(self, data:list):
-        for i in range(data):
+        children = self.listFrame.winfo_children()
+
+        for i in range(len(children)):
+            if i > 3:
+                children[i].destroy()
+
+        for i in range(len(data)):
             self.item_search_list(data[i], (i+1))
         
-        # self.listFrame.grid(row=1, column=0)
 
     def search_result(self):
-        criteria = self.criteriaCombo.get().lower
+        criteria = self.criteriaCombo.get().lower()
         search = self.searchEntry.get()
         id = None
 

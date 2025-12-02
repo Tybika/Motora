@@ -93,11 +93,11 @@ class MapData(Handler):
                             document["class-flex"], document["class-cardio"]
                             ])
                 
-                data = _list
+                request.data["data"] = _list
                 request.add_state("listed")
 
             if self.next and not request.is_complete():
-                self.next.handle(request)
+                return self.next.handle(request)
             else:
                 return self.new_response("success", request)
         

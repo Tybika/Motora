@@ -51,6 +51,7 @@ class Motora:
             case "read" | "retrieve" | "get" | "query" | "r" | "g" | "q":
                 request.set_operation(2)
                 request.set_data_id(id)
+                print(request.data)
 
             case "update" | "u":
                 request.set_operation(3)
@@ -78,7 +79,7 @@ class Motora:
             response = Response()
             response.set_type("error")
         
-        if response.type:
+        if not response.type == None:
             return response.data
         else:
             raise Exception("só no final")
