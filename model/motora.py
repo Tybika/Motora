@@ -65,7 +65,7 @@ class Motora:
                 if not type(id) == dict:
                     request = None
 
-        if request:
+        if not request == None:
             request.set_data_id(id)
         return request         
 

@@ -96,7 +96,9 @@ class Sanitizer(Handler):
 
                 elif type(data) == dict and not id == None and "meta" in id:
                     data["count"] = self.present_num(data["count"])
-                    data["last"] = self.present_date(data["last"])
+                    
+                    if not type(data["last"]) == str: 
+                        data["last"] = self.present_date(data["last"])
 
                 else:
                     for result in data:

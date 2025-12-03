@@ -22,13 +22,15 @@ class Database(Handler):
         return list(self.athletes.find(filter, {'_id': 0}))
     
     def get_meta(self):
-        meta = {"count": 0, "last": ""}
+        meta = {"count": 0, "last": "-/-/-"}
 
         meta["count"] = self.athletes.count_documents({})
 
-        # Utiliza o kwarg sort ao invés do filtro usando documento {}
-        latest = self.athletes.find_one(sort=[("_id", -1)])
-        meta["last"] = latest["_id"].generation_time
+        if meta["count"] > 0:
+            # Utiliza o kwarg sort ao invés do filtro usando documento {}
+            latest = self.athletes.find_one(sort=[("_id", -1)])
+            meta["last"] = latest["_id"].generation_time
+        
         return meta
 
     def update_document(self, request_data):
