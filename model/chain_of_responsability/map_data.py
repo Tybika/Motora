@@ -1,4 +1,3 @@
-import paths
 from handler import Handler
 
 class MapData(Handler):
@@ -64,26 +63,33 @@ class MapData(Handler):
                                 mapped["cardio"] = data[key]
                                 vector[5] = data[key]
                             case _:
-                                pass
-                            
-                    mapped["vector"] = data            
+                                pass            
                 
                 self.drop_empty(mapped)
                 request.set_data_data(mapped)
                 request.add_state("mapped")
 
             elif request.operation == 2:
+                id = request.data["id"]
                 _list = []
 
-                if "count" in data:
-                    _list = [document["count"], document["last"]]
+                if not id == None and "meta" in id:
+                    _list = [data["count"], data["last"]]
 
+                elif not id == None and "plot" in id:
+                    for document in data:
+                        _list.append([
+                            document["age"], document["flex"], 
+                            document["cardio"], document["class-flex"], 
+                            document["class-cardio"]
+                            ])
+                    
                 elif type(data) == dict:
-                    _list = [
-                        document["name"], document["age"], document["sex"], 
-                        document["weigth"], document["heigth"], 
-                        document["class-flex"], document["class-cardio"]
-                        ]
+                    _list = [[
+                        data["name"], data["age"], data["sex"], 
+                        data["weigth"], data["heigth"], 
+                        data["class-flex"], data["class-cardio"]
+                        ]]
 
                 else:
                     for document in data:
@@ -102,5 +108,4 @@ class MapData(Handler):
                 return self.new_response("success", request)
         
         except Exception as e:
-            print(e)
             return self.new_response("error", request)

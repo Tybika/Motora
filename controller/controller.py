@@ -9,26 +9,64 @@ class Controller:
     def set_view(self, view: object):
         self.view = view
 
-    def test_connection(self):
-        print("NEW:", self.model.process("n", data=["Mimi", "59", "Feminino", "49,7", "1,5", "-16,8", "452"]))
-        print("READ:",self.model.process('r'))
-        print("UPDATE:",self.model.process('u', data_id={'name': "Mimi"}, data=["Mimizinha", "", "", "", "", "", ""]))
-        print("READ2:",self.model.process('r'))
-
     def get_general_data(self):
-        return self.model.process("retrieve")
+        response = self.model.process("retrieve")
+        if not type(response) == bool:
+            return response
+        else: 
+            self.view.alert()
     
+    def get_plot_data(self):
+        response = self.model.process("retrieve", data_id={"plot": ''})
+
+        if not type(response) == bool:
+            return response
+        else: 
+            self.view.alert()
+    
+    def get_metadata(self):
+        response = self.model.process("retrieve", data_id={"meta": ''})
+
+        if not type(response) == bool:
+            return response
+        else: 
+            self.view.alert()
+
     def get_search_options(self):
-        return self.model.get_options("search")
+        response = self.model.get_options("search")
+
+        if not type(response) == bool:
+            return response
+        else: 
+            self.view.alert()
     
     def get_sex_options(self):
-        return self.model.get_options("sex")
+        response = self.model.get_options("sex")
+
+        if not type(response) == bool:
+            return response
+        else: 
+            self.view.alert()
     
     def get_athlete_data(self, identifier: dict = None):
-        return self.model.process("query", data_id=identifier)
+        response = self.model.process("query", data_id=identifier)
+
+        if not type(response) == bool:
+            return response
+        else: 
+            self.view.alert()
     
     def save_data(self, data):
-        self.model.process("create", data=data)
+        response = self.model.process("create", data=data)
+        if not type(response) == bool:
+            return response
+        else: 
+            self.view.alert()
 
     def alter_data(self, data: dict):
-        self.model.process("update", {"id": data.id, "data": data.data })
+        response = self.model.process("update", {"id": data.id, "data": data.data })
+
+        if not type(response) == bool:
+            return response
+        else: 
+            self.view.alert()

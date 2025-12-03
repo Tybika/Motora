@@ -11,19 +11,23 @@ class Database(Handler):
         self.database = self.client["motora"]
         self.athletes = self.database["athletes"]
 
-    def get_athletes(self, request_data):
-        if request_data["id"] == None:
+    def get_athletes(self, request_data=None):
+        if request_data == None or request_data["id"] == None:
             return list(self.athletes.find({}, {'_id': 0}))  
-        else:
-            return self.athletes.find_one(request_data["id"])
+        
+        filter = {}
+        for key, value in request_data["id"].items():
+            filter[key] = {"$regex": f"^{value}", "$options": "i"}
+
+        return list(self.athletes.find(filter, {'_id': 0}))
     
     def get_meta(self):
         meta = {"count": 0, "last": ""}
-        meta["count"] = self.athletes.countDocuments(self.athletes.find({}))
+
+        meta["count"] = self.athletes.count_documents({})
 
         # Utiliza o kwarg sort ao invés do filtro usando documento {}
-        latest = self.athletes.find_one(sort=["_id", -1])
-
+        latest = self.athletes.find_one(sort=[("_id", -1)])
         meta["last"] = latest["_id"].generation_time
         return meta
 
@@ -47,9 +51,12 @@ class Database(Handler):
                 request.add_state("stored")
 
             elif op == 2:
-                if not request.data["id"] == None:
-                    if "meta" in request.data["id"]:
-                        request.set_data_data(self.get_meta())
+                if not request.data["id"] == None and "meta" in request.data["id"]:
+                    request.set_data_data(self.get_meta())
+
+                elif not request.data["id"] == None and "plot" in request.data["id"]:
+                    request.set_data_data(self.get_athletes())                
+                
                 else:
                     request.set_data_data(self.get_athletes(request.data))
 
@@ -66,5 +73,4 @@ class Database(Handler):
                 return self.new_response("success", request)
             
         except Exception as e:
-            print(e)
             return self.new_response("error", request)

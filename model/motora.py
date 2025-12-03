@@ -18,7 +18,7 @@ class Motora:
     def get_options(self, group:str):
         options = {
             "sex" : ["Feminino", "Masculino"],
-            "search" : ["Nome", "Sexo"]
+            "search" : ["Nome"]
             }
 
         if group in options:
@@ -38,30 +38,31 @@ class Motora:
         self._map.set_next(self.classify)
         self.classify.set_next(self.persist)
 
-    def request(self, type: str, id: dict, data: list):
+    def request(self, request_type: str, id: dict, data: list):
         request = Request()
 
-        match type:
+        match request_type:
             case "create" | "new" | "n" | "c":
                 request.set_operation(1)
-                if not data:
+                if not type(data) == list:
                     request = None
-                request.set_data_data(data)
+                else:
+                    request.set_data_data(data)
 
             case "read" | "retrieve" | "get" | "query" | "r" | "g" | "q":
                 request.set_operation(2)
                 request.set_data_id(id)
-                print(request.data)
 
             case "update" | "u":
                 request.set_operation(3)
-                if not id or not data:
+                if not type(id) == dict or not type(data) == list:
                     request = None
-                request.set_data_data(data)
+                else:
+                    request.set_data_data(data)
 
             case "delete" | "erase" | "d" | "e":
                 request.set_operation(4)
-                if not id:
+                if not type(id) == dict:
                     request = None
 
         if request:
@@ -71,16 +72,15 @@ class Motora:
     def process(self, request_type: str, data_id: dict = None, data: list = None):
         request = self.request(request_type, data_id, data)
 
-        # Se o request , dispara corrente
-        if request:
+        # Se o request não for None, dispara cadeia
+        if not request == None:
             response = self.query.handle(request)
-            print(response)
         else:
             response = Response()
             response.set_type("error")
         
-        if not response.type == None:
+        if not response.type == None and response.type:
             return response.data
         else:
-            raise Exception("só no final")
+            return response.type
     

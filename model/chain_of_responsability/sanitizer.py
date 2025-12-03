@@ -1,16 +1,12 @@
-import paths
 from datetime import datetime, timezone, timedelta
 from handler import Handler
-from request import Request
 
 class Sanitizer(Handler):
     def sanit_name(self, name:str):
-        no_space = name
-        no_space.strip()
-
+        no_space = name.replace(" ", "")
         if no_space.isalpha():
-            return name.title()
-        
+            return name.title().strip()
+
         return 0
 
     def sanit_num(self, number: str, isdecimal = False):
@@ -34,7 +30,6 @@ class Sanitizer(Handler):
         _date = date.astimezone(timezone(timedelta(hours=-3)))
         _date = _date.strftime("%d/%m/%Y")
         return _date
-
     
     def present_num(self, number: int | float):
         return str(number).replace(".", ",")
@@ -95,20 +90,25 @@ class Sanitizer(Handler):
                 request.add_state("sanitized")
 
             elif request.operation == 2:
-                for result in data:
-                    for key in result:
-                        match key:
-                            case "count":
-                                result[key] = self.present_num(result[key])
-                            case "latest":
-                                result[key] = self.present_date(result[key])
-                            case "age" | "cardio" | "weigth" | "heigth" | "flex":
-                                result[key] = self.present_num(result[key])
-                            case "sex":
-                                result[key] = self.present_sex(result[key])
-                            case "class-flex" | "class-cardio":
-                                result[key] = self.present_class(result[key])
+                id = request.data["id"]
+                if type(data) == list and not id == None and "plot" in id:
+                    pass
 
+                elif type(data) == dict and not id == None and "meta" in id:
+                    data["count"] = self.present_num(data["count"])
+                    data["last"] = self.present_date(data["last"])
+
+                else:
+                    for result in data:
+                        for key in result:
+                            match key:
+                                case "age" | "cardio" | "weigth" | "heigth" | "flex":
+                                    result[key] = self.present_num(result[key])
+                                case "sex":
+                                    result[key] = self.present_sex(result[key])
+                                case "class-flex" | "class-cardio":
+                                    result[key] = self.present_class(result[key])
+        
                 request.add_state("presented")
 
             if self.next and not request.is_complete():
@@ -117,5 +117,4 @@ class Sanitizer(Handler):
                 return self.new_response("success", request)
             
         except Exception as e:
-            print(e)
             return self.new_response("error", request)

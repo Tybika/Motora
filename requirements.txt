@@ -1,12 +1,7 @@
-numpy
-scipy
 joblib
-threadpoolctl
-cython
-meson-python
 customtkinter
 pymongo
 scikit-learn
 matplotlib
-statistics
 CTkMenuBar
+CustomTkinterMessagebox

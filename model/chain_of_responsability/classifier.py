@@ -38,5 +38,4 @@ class Classifier(Handler):
                 return self.new_response("success", request)
         
         except Exception as e:
-            print(e)
             return self.new_response("error", request)
