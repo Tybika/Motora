@@ -294,11 +294,11 @@ class MainView:
         class_cardio = []
         
         for athlete in data:
-                age.append(athlete[0])
-                flex.append(athlete[1])
-                cardio.append(athlete[2])
-                class_flex.append(athlete[3])
-                class_cardio.append(athlete[4])
+            age.append(athlete[0])
+            flex.append(athlete[1])
+            cardio.append(athlete[2])
+            class_flex.append(athlete[3])
+            class_cardio.append(athlete[4])
 
         # Cria nova figura, com ambas imagens
         figure = Figure()
@@ -306,18 +306,20 @@ class MainView:
         cardio_plot = figure.add_subplot(122)
 
         # Cria plotagem de flexibilidade
-        flex_scatter = flex_plot.scatter(age, flex, c=class_flex, cmap="viridis")
+        flex_scatter = flex_plot.scatter(age, flex, c=class_flex, 
+                                         cmap="viridis", vmin=0, vmax=5)
         flex_plot.set_xlabel("Idade")
         flex_plot.set_ylabel("Flexibilidade em cm")
         flex_plot.set_title("Aptidão para flexibilidade")
         flex_scale = figure.colorbar(flex_scatter, ax=flex_plot)
 
         # Cria plotagem de cardiovascular
-        cardio_scatter = cardio_plot.scatter(age, cardio, c=class_cardio, cmap="plasma")
+        cardio_scatter = cardio_plot.scatter(age, cardio, c=class_cardio, 
+                                             cmap="plasma", vmin=0, vmax=5)
         cardio_plot.set_xlabel("Idade")
         cardio_plot.set_ylabel("Metros em 6min")
         cardio_plot.set_title("Aptidão cardiovascular")
-        cardio_scale = figure.colorbar(flex_scatter, ax=cardio_plot)
+        cardio_scale = figure.colorbar(cardio_scatter, ax=cardio_plot)
 
         # Configura ticks e tórulos dos gráficos
         ticks = [0, 1, 2, 3, 4, 5]
