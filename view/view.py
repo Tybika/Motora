@@ -1,6 +1,9 @@
-import tkinter as tk
 import customtkinter as ctk
 from CTkMenuBar import *
+from CustomTkinterMessagebox import CTkMessagebox
+import matplotlib.pyplot as plot
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class MainView:
     def __init__(self):
@@ -13,22 +16,53 @@ class MainView:
 
     def home(self):
         self.root.geometry(f"1280x720+0+0")
+        self.root.title("Motora")
         menu = CTkMenuBar(master=self.root)
         menu.add_cascade("Novo atleta", command=self.register)
         menu.add_cascade("Buscar atleta", command=self.search)
         
-        mainFrame = ctk.CTkFrame(self.root)
+        # Cria frames para organização 
+        homeFrame = ctk.CTkFrame(self.root, fg_color="transparent",
+                                      width=1280)
+        self.plotFrame = ctk.CTkFrame(homeFrame, fg_color="transparent",
+                                      width=1280)
+        infoFrame = ctk.CTkFrame(homeFrame, fg_color="transparent",
+                                 width=1280)
+
+        # Cria widgets
+        countLabel = ctk.CTkLabel(infoFrame, text="Total de registros:",
+                                   bg_color="transparent")
+        self.countLabel = ctk.CTkLabel(infoFrame, text="",
+                                   bg_color="transparent")
+        
+        dateLabel = ctk.CTkLabel(infoFrame, text="Data do último registro:",
+                                   bg_color="transparent")
+        self.dateLabel = ctk.CTkLabel(infoFrame, text="",
+                                   bg_color="transparent")
+        
+        # Posiciona Widgets
+        countLabel.grid(row=0, column=1, sticky="e")
+        self.countLabel.grid(row=0, column=2, sticky="e")
+
+        dateLabel.grid(row=1, column=1)
+        self.dateLabel.grid(row=1, column=2)
+
+        # Posiciona frames
+        infoFrame.pack()
+        self.plotFrame.pack(expand=True, fill="both")
+
+        homeFrame.pack(expand=True, fill="both")
 
     def register(self):
         # Cria e configura a janela
-        window = ctk.CTkToplevel(self.root)
-        window.title("Novo Atleta")
-        window.geometry("500x400")
-        window.grab_set()
-        window.focus()
+        self.r_window = ctk.CTkToplevel(self.root)
+        self.r_window.title("Novo Atleta")
+        self.r_window.geometry("500x400")
+        self.r_window.grab_set()
+        self.r_window.focus()
 
         # Cria frames para organização
-        mainFrame = ctk.CTkFrame(window, fg_color="transparent")
+        mainFrame = ctk.CTkFrame(self.r_window, fg_color="transparent")
         personalFrame = ctk.CTkFrame(mainFrame, fg_color="transparent")
         testFrame = ctk.CTkFrame(mainFrame, fg_color="transparent")
         buttonFrame = ctk.CTkFrame(mainFrame, fg_color="transparent")
@@ -77,7 +111,7 @@ class MainView:
 
         cancelButton = ctk.CTkButton(buttonFrame, text="Cancelar", fg_color="gray",
                                      bg_color="transparent",
-                                     command=window.destroy)
+                                     command=self.r_window.destroy)
         sendButton = ctk.CTkButton(buttonFrame, text="Salvar", 
                                    bg_color="transparent",
                                    command=self.save_athlete)
@@ -163,6 +197,8 @@ class MainView:
         self.listFrame.columnconfigure([1, 2, 3], weight=1, pad=10)
 
         searchFrame.columnconfigure(0, pad=10)
+        mainFrame.rowconfigure(0, weight=1)
+        mainFrame.rowconfigure(1, weight=2)
 
         # Posiciona widgets
         criteriaLabel.grid(row=0, column=0, sticky="w")
@@ -178,13 +214,12 @@ class MainView:
         cardioLabel.grid(row=0, column=3, sticky="w")
 
         # Posiciona frames
-        searchFrame.grid(row=0, column=0, sticky="w", padx=20)
-        self.listFrame.grid(row=1, column=0, sticky="ew", padx=10)
+        searchFrame.pack(padx=10, pady=10, anchor="w")
+        self.listFrame.pack(expand=True, fill="y")
 
-        mainFrame.grid(row=0, column=0)
+        mainFrame.pack(expand=True, fill="y")
 
     def item_search_list(self, data:list, row:int):
- 
         name = ctk.CTkLabel(self.listFrame, text=data[0], 
                             bg_color="transparent")
         age = ctk.CTkLabel(self.listFrame, text=data[1],
@@ -209,7 +244,6 @@ class MainView:
         for i in range(len(data)):
             self.item_search_list(data[i], (i+1))
         
-
     def search_result(self):
         criteria = self.criteriaCombo.get().lower()
         search = self.searchEntry.get()
@@ -218,11 +252,7 @@ class MainView:
         if criteria == "nome" and len(search) > 0:
             id = {"name": search}
 
-        elif criteria == "sexo" and len(search) > 0:
-            id = {"sex": search}
-
         self.update_search_list(self.controller.get_athlete_data(id))
-
 
     def save_athlete(self):
         # Considera a checkbox para classificar segundo gênero
@@ -235,6 +265,7 @@ class MainView:
         else:
             sex = self.sexCombo.get()
 
+        complete = True
         data = [self.nameEntry.get(),
                 self.ageEntry.get(),
                 sex,
@@ -243,13 +274,81 @@ class MainView:
                 self.flexEntry.get(),
                 self.cardioEntry.get()
                 ]
-        
-        self.controller.save_data(data)
 
+        for i in range(len(data)):
+            if len(data[i]) == 0:
+                complete = False
+
+        if complete:
+            self.controller.save_data(data)
+            self.plot_classes(self.controller.get_plot_data())
+            self.update_metadata()
+            self.r_window.destroy()
+
+    def plot_classes(self, data):
+        # Agrupa em vetores por característica
+        age = []
+        flex = []
+        cardio = []
+        class_flex = []
+        class_cardio = []
+        
+        for athlete in data:
+                age.append(athlete[0])
+                flex.append(athlete[1])
+                cardio.append(athlete[2])
+                class_flex.append(athlete[3])
+                class_cardio.append(athlete[4])
+
+        # Cria nova figura, com ambas imagens
+        figure = Figure()
+        flex_plot = figure.add_subplot(121)
+        cardio_plot = figure.add_subplot(122)
+
+        # Cria plotagem de flexibilidade
+        flex_scatter = flex_plot.scatter(age, flex, c=class_flex, cmap="viridis")
+        flex_plot.set_xlabel("Idade")
+        flex_plot.set_ylabel("Flexibilidade em cm")
+        flex_plot.set_title("Aptidão para flexibilidade")
+        flex_scale = figure.colorbar(flex_scatter, ax=flex_plot)
+
+        # Cria plotagem de cardiovascular
+        cardio_scatter = cardio_plot.scatter(age, cardio, c=class_cardio, cmap="plasma")
+        cardio_plot.set_xlabel("Idade")
+        cardio_plot.set_ylabel("Metros em 6min")
+        cardio_plot.set_title("Aptidão cardiovascular")
+        cardio_scale = figure.colorbar(flex_scatter, ax=cardio_plot)
+
+        # Configura ticks e tórulos dos gráficos
+        ticks = [0, 1, 2, 3, 4, 5]
+        labels = ["M. fraco", "Fraco", "Razoável", "Bom", "M. bom", "Excelente"]
+
+        flex_scale.set_ticks(ticks)
+        flex_scale.set_ticklabels(labels)
+        cardio_scale.set_ticks(ticks)
+        cardio_scale.set_ticklabels(labels)
+
+        # Limpa plot anterior do frame
+        children = self.plotFrame.winfo_children()
+        for child in children:
+            child.destroy()
+
+        # Cria canva e posiciona plot
+        canvas = FigureCanvasTkAgg(figure, master=self.plotFrame)
+        canvas.draw()
+        canvas.get_tk_widget().pack(expand=True, fill="both")
+
+    def update_metadata(self):
+        meta = self.controller.get_metadata()
+        self.countLabel.configure(text=meta[0])
+        self.dateLabel.configure(text=meta[1])
+
+    def alert(self):
+        CTkMessagebox.messagebox(title="Erro", 
+                                 text="Houve um erro no processamento, tente refazer a solicitação")
 
     def _run(self):
-        button = ctk.CTkButton(self.root, text='test connection',
-                               command=self.controller.test_connection)
-        button.pack()
+        self.update_metadata()
+        self.plot_classes(self.controller.get_plot_data())
         self.root.mainloop()
     
